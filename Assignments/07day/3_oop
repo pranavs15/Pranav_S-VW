@@ -1,0 +1,93 @@
+
+from abc import ABC, abstractmethod
+
+
+
+# Abstract Base Class 
+
+# This class defines the fixed sequence:
+# Parse → Validate → (Optional Revalidate) → Save
+# Subclasses must implement the required steps.
+class Report(ABC):
+
+    def generate(self):
+        self.parse()
+        self.validate()
+
+        if self.requires_revalidation():
+            self.revalidate()
+
+        self.save()
+
+  
+    @abstractmethod
+    def parse(self):
+        pass
+
+    @abstractmethod
+    def validate(self):
+        pass
+
+
+    def revalidate(self):
+        pass
+
+    @abstractmethod
+    def save(self):
+        pass
+
+    def requires_revalidation(self):
+        return False
+
+
+# Standard Report Class
+
+class StandardReport(Report):
+
+    def parse(self):
+        print("Parsing standard report...")
+
+    def validate(self):
+        print("Validating standard report...")
+
+    def save(self):
+        print("Saving standard report...")
+
+
+# Special Report Class
+
+class SpecialReport(Report):
+
+    def parse(self):
+        print("Parsing special report...")
+
+    def validate(self):
+        print("Validating special report...")
+
+    def revalidate(self):
+        print("Revalidating special report...")
+
+    def save(self):
+        print("Saving special report...")
+
+    # Override hook to enforce revalidation
+    def requires_revalidation(self):
+        return True
+
+
+
+# Client Function
+
+def generate_report(report: Report):
+    report.generate()
+
+
+if __name__ == "__main__":
+
+    print("Standard Report Flow:")
+    standard = StandardReport()
+    generate_report(standard)
+
+    print("\nSpecial Report Flow:")
+    special = SpecialReport()
+    generate_report(special)

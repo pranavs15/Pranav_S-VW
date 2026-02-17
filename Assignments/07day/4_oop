@@ -1,0 +1,149 @@
+from abc import ABC, abstractmethod
+from functools import wraps
+import time
+import json
+
+
+# DECORATORS
+
+
+# Logging decorator
+def log_execution(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        print(f"[LOG] Starting '{func.__name__}'")
+        result = func(*args, **kwargs)
+        print(f"[LOG] Finished '{func.__name__}'")
+        return result
+    return wrapper
+
+
+# Timing decorator
+def measure_time(func):
+    @wraps(func)
+    def wrapper(*args, **kwargs):
+        start = time.time()
+        result = func(*args, **kwargs)
+        end = time.time()
+        print(f"[TIME] {func.__name__} took {end - start:.6f} seconds")
+        return result
+    return wrapper
+
+
+# Validation decorator for save method
+def validate_output(func):
+    @wraps(func)
+    def wrapper(self, filename, data_generator):
+        if data_generator is None:
+            raise ValueError("No data to save.")
+
+        try:
+            peek = next(data_generator)
+        except StopIteration:
+            raise ValueError("Report data is empty.")
+
+        # Rebuild generator including the peeked value
+        def new_generator():
+            yield peek
+            for item in data_generator:
+                yield item
+
+        return func(self, filename, new_generator())
+
+    return wrapper
+
+
+# CONTEXT MANAGER
+
+class FileManager:
+   
+
+    def __init__(self, filename, mode):
+        self.filename = filename
+        self.mode = mode
+        self.file = None
+
+    def __enter__(self):
+        print(f"[CTX] Opening file: {self.filename}")
+        self.file = open(self.filename, self.mode, encoding="utf-8")
+        return self.file
+
+    def __exit__(self, exc_type, exc_value, traceback):
+        print(f"[CTX] Closing file: {self.filename}")
+        if self.file:
+            self.file.close()
+
+
+# ABSTRACT BASE CLASS
+
+class Report(ABC):
+ 
+
+    @log_execution
+    @measure_time
+    def generate(self, filename):
+        data = self.report_data()
+        self.save(filename, data)
+
+    @abstractmethod
+    def report_data(self):
+       
+        pass
+
+    @abstractmethod
+    def save(self, filename, data_generator):
+       
+        pass
+
+
+# TEXT REPORT
+
+class TextReport(Report):
+\
+    def report_data(self):
+        for i in range(1, 6):
+            yield f"Line {i}: Sample text data\n"
+
+
+    @validate_output
+    def save(self, filename, data_generator):
+        with FileManager(filename, "w") as file:
+            for line in data_generator:
+                file.write(line)
+
+
+# JSON REPORT
+
+class JSONReport(Report):
+
+    # Generator producing structured data lazily
+    def report_data(self):
+        for i in range(1, 6):
+            yield {"id": i, "value": f"Item {i}"}
+
+    # Save structured data safely
+    @validate_output
+    def save(self, filename, data_generator):
+        with FileManager(filename, "w") as file:
+            data_list = list(data_generator)
+            json.dump(data_list, file, indent=4)
+
+
+
+# CLIENT FUNCTION
+
+def generate_report(report: Report, filename: str):
+    report.generate(filename)
+
+
+# MAIN EXECUTION
+
+if __name__ == "__main__":
+
+    print("\n--- Generating Text Report ---")
+    text_report = TextReport()
+    generate_report(text_report, "report.txt")
+
+    print("\n--- Generating JSON Report ---")
+    json_report = JSONReport()
+    generate_report(json_report, "report.json")
