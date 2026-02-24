@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Birthday Message</title>
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            text-align: center;
+        }
+
+        #message {
+            transition: all 0.5s ease;
+        }
+
+        .birthday-style {
+            font-size: 50px;
+            color: white;
+            background: linear-gradient(45deg, red, orange, yellow, green, blue, purple);
+            padding: 20px;
+            border-radius: 10px;
+            animation: zoom 1s infinite alternate;
+        }
+
+        @keyframes zoom {
+            from { transform: scale(1); }
+            to { transform: scale(1.1); }
+        }
+
+        #gif {
+            display: none;
+            width: 200px;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+
+<h4>There is a message for you!!</h4>
+<p id="message">wait..</p>
+<button onclick="changeText()">Click here to get it!</button>
+
+<img id="gif" 
+src="https://media.giphy.com/media/l0MYt5jPR6QX5pnqM/giphy.gif">
+
+<script>
+let count = 0;
+let size = 16;
+let colors = ["red", "blue", "green", "purple"];
+
+function changeText() {
+    count++;
+    let msg = document.getElementById("message");
+
+    if (count < 4) {
+        size += 20;
+        msg.style.fontSize = size + "px";
+        msg.style.color = colors[count - 1];
+    }
+
+    if (count === 4) {
+        msg.innerHTML = "🎉 Happy Birthday 🎂";
+        msg.removeAttribute("style");
+        msg.classList.add("birthday-style");
+        document.getElementById("gif").style.display = "block";
+    }
+}
+</script>
+
+</body>
+</html>
