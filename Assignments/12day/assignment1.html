@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Perfect Touch Crash</title>
+  <style>
+    body {
+      text-align: center;
+      background: #87CEEB;
+      overflow: hidden;
+      font-family: Arial, sans-serif;
+    }
+
+    .road {
+      position: relative;
+      width: 100%;
+      height: 250px;
+      background: #444;
+      margin-top: 150px;
+      border-top: 6px dashed white;
+      border-bottom: 6px dashed white;
+    }
+
+    .car {
+      position: absolute;
+      bottom: 80px;
+      font-size: 140px;
+      transition: transform 0.8s ease-in;
+    }
+
+    /* Left car faces right */
+    #car1 {
+      left: 0;
+      transform: scaleX(-1);
+    }
+
+    /* Right car faces left */
+    #car2 {
+      right: 0;
+    }
+
+    button {
+      padding: 10px 20px;
+      margin: 10px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    .explosion {
+      position: absolute;
+      font-size: 160px;
+      display: none;
+    }
+
+    .popup {
+      position: fixed;
+      top: 40%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background: white;
+      padding: 25px 40px;
+      border-radius: 15px;
+      display: none;
+      box-shadow: 0 0 25px black;
+      font-size: 22px;
+      font-weight: bold;
+    }
+  </style>
+</head>
+<body>
+
+  <h1>🚗 Perfect Bumper Touch 🚗</h1>
+
+  <button onclick="startCar1()">Start Car 1</button>
+  <button onclick="startCar2()">Start Car 2</button>
+
+  <div class="road">
+    <div id="car1" class="car">🚗</div>
+    <div id="car2" class="car">🚗</div>
+    <div id="explosion" class="explosion">💥</div>
+  </div>
+
+  <div id="popup" class="popup">
+  Hope you both have insurance 😂
+</div>
+
+<script>
+let car1 = document.getElementById("car1");
+let car2 = document.getElementById("car2");
+let explosion = document.getElementById("explosion");
+let popup = document.getElementById("popup");
+
+let speed = 6;
+let move1 = false;
+let move2 = false;
+let crashed = false;
+
+function startCar1() { move1 = true; }
+function startCar2() { move2 = true; }
+
+function moveCars() {
+
+  if (crashed) return requestAnimationFrame(moveCars);
+
+  if (move1) {
+    car1.style.left = (car1.offsetLeft + speed) + "px";
+  }
+
+  if (move2) {
+    car2.style.right = (parseInt(car2.style.right || 0) + speed) + "px";
+  }
+
+  let rect1 = car1.getBoundingClientRect();
+  let rect2 = car2.getBoundingClientRect();
+
+  // EXACT TOUCH COLLISION
+  if (rect1.right >= rect2.left) {
+    crashed = true;
+    move1 = false;
+    move2 = false;
+    crash(rect1, rect2);
+  }
+
+  requestAnimationFrame(moveCars);
+}
+
+function crash(rect1, rect2) {
+
+  let impactPoint = rect2.left - 80;
+
+  explosion.style.left = impactPoint + "px";
+  explosion.style.top = "160px";
+  explosion.style.display = "block";
+
+  popup.style.display = "block";
+
+  car1.style.transform = "scaleX(-1) rotate(90deg) translateY(250px)";
+  car2.style.transform = "rotate(-90deg) translateY(250px)";
+}
+
+moveCars();
+</script>
+
+</body>
+</html>
