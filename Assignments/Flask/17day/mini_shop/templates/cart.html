@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Cart</title>
+    <style>
+        body {
+            font-family: Arial;
+            background-color: #f4f6f9;
+            text-align: center;
+        }
+
+        .container {
+            width: 60%;
+            margin: auto;
+        }
+
+        .item {
+            background: white;
+            padding: 15px;
+            margin: 10px;
+            border-radius: 5px;
+            box-shadow: 0 0 5px gray;
+        }
+
+        .btn {
+            text-decoration: none;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 4px;
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .blue { background-color: #007bff; }
+        .green { background-color: green; }
+        .red { background-color: red; }
+
+        .btn:hover {
+            opacity: 0.8;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h2>Your Cart</h2>
+
+    {% if cart %}
+        {% for item, qty in cart.items() %}
+            <div class="item">
+                <h3>{{ item }}</h3>
+                <p>
+                    ₹{{ prices[item] }} × {{ qty }}
+                    = ₹{{ prices[item] * qty }}
+                </p>
+
+                <a class="btn blue" href="/cart/increase/{{ item }}">+</a>
+                <a class="btn blue" href="/cart/decrease/{{ item }}">-</a>
+            </div>
+        {% endfor %}
+
+        <h3>Total: ₹{{ total }}</h3>
+
+        <a class="btn red" href="/cart/clear">Clear Cart</a>
+        <br><br>
+
+    {% else %}
+        <p>Your cart is empty</p>
+    {% endif %}
+
+    <!-- ✅ Go to Products Button -->
+    <a class="btn green" href="/products">Go to Products</a>
+
+</div>
+
+</body>
+</html>

@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Upload Products CSV</title>
+</head>
+<body>
+<h2>Upload Product CSV</h2>
+
+<form id="uploadForm">
+    <input type="file" id="fileInput" accept=".csv" required>
+    <button type="submit">Upload</button>
+</form>
+
+<h3>Response:</h3>
+<pre id="response"></pre>
+
+<script>
+document.getElementById("uploadForm").addEventListener("submit", async function(e){
+    e.preventDefault();
+
+    const fileInput = document.getElementById("fileInput");
+    const file = fileInput.files[0];
+    if(!file) return alert("Please select a file");
+
+    const formData = new FormData();
+    formData.append("file", file); // MUST match 'request.files["file"]' in Flask
+
+    try {
+        const resp = await fetch("http://localhost:5000/api/upload-products", {
+            method: "POST",
+            body: formData
+        });
+
+        const contentType = resp.headers.get("content-type");
+        if(contentType && contentType.includes("application/json")){
+            const data = await resp.json();
+            document.getElementById("response").textContent = JSON.stringify(data, null, 2);
+        } else {
+            const text = await resp.text();
+            document.getElementById("response").textContent = "Server returned non-JSON:\n" + text;
+        }
+    } catch(err){
+        document.getElementById("response").textContent = "Error: " + err;
+    }
+});
+</script>
+</body>
+</html>
