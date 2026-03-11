@@ -1,0 +1,20 @@
+<h2>All Employees</h2>
+<table border="1">
+<tr><th>Name</th><th>Email</th><th>Department</th><th>Actions</th></tr>
+{% for e in employees %}
+<tr>
+  <td>{{e.name}}</td>
+  <td>{{e.email}}</td>
+  <td>{{e.department}}</td>
+  <td>
+    <a href="{{ url_for('employee_view', id=e.id) }}">View</a> | 
+    <a href="{{ url_for('employee_edit', id=e.id) }}">Edit</a>
+    {% if session.role=='Admin' %}
+    <form action="{{ url_for('employee_delete', id=e.id) }}" method="post" style="display:inline;">
+      <button type="submit">Delete</button>
+    </form>
+    {% endif %}
+  </td>
+</tr>
+{% endfor %}
+</table>
